@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -28,9 +29,10 @@ class ShoppingListPage extends StatefulWidget {
 
 class _ShoppingListPageState extends State<ShoppingListPage> {
   List<ShoppingItem> _items = [];
-  _addItem() {
+
+  _addNewItem(ShoppingItem item) {
     setState(() {
-      _items.add(ShoppingItem(name: "new item"));
+      _items.add(item);
     });
   }
 
@@ -51,13 +53,22 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
     return Scaffold(
       appBar: AppBar(
           backgroundColor: Colors.blue, title: const Text("Shopping list")),
-      body: ShoppingList(
-        items: _items,
-        toggleComplete: _toggleComplete,
-        onCheckout: _onCheckout,
-      ),
-      floatingActionButton: FloatingActionButton(
-          onPressed: _addItem, child: const Icon(Icons.add)),
+      body: Column(children: [
+        _items.isEmpty
+            ? const Expanded(
+                child: Center(
+                child: Text("No items added", style: TextStyle(fontSize: 20)),
+              ))
+            : Expanded(
+                child: ShoppingList(
+                items: _items,
+                toggleComplete: _toggleComplete,
+                onCheckout: _onCheckout,
+              )),
+        AddNewItemContainer(addNewItem: _addNewItem)
+      ]),
+      // floatingActionButton: FloatingActionButton(
+      //     onPressed: _addItem, child: const Icon(Icons.add)),
     );
   }
 }
@@ -66,7 +77,7 @@ const BASE_UNITS = ["kpl", "g", "kg", "l"];
 
 class ShoppingItem {
   String name;
-  late int quantity;
+  late double quantity;
   late String unit;
   late bool complete;
   ShoppingItem(
@@ -107,7 +118,8 @@ class ShoppingListItem extends StatelessWidget {
                     children: [
                       FractionallySizedBox(
                         widthFactor: 0.85,
-                        child: Text(item.name,
+                        child: Text(
+                            "${item.name}, ${item.quantity} ${item.unit}",
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -245,5 +257,96 @@ class ZeroHeightIconButton extends StatelessWidget {
       constraints: const BoxConstraints(),
       style: const ButtonStyle(tapTargetSize: MaterialTapTargetSize.shrinkWrap),
     );
+  }
+}
+
+class AddNewItemContainer extends StatefulWidget {
+  const AddNewItemContainer({super.key, required this.addNewItem});
+
+  final Function(ShoppingItem item) addNewItem;
+
+  @override
+  State<AddNewItemContainer> createState() => _AddNewItemContainerState();
+}
+
+class _AddNewItemContainerState extends State<AddNewItemContainer> {
+  late String? name;
+  late double? quantity;
+  late String? unit;
+
+  _addNewItem() {
+    setState(() {
+      if (name != null && quantity != null && unit != null) {
+        widget.addNewItem(
+            ShoppingItem(name: name!, quantity: quantity!, unit: unit!));
+        name = null;
+        quantity = null;
+        unit = null;
+      }
+    });
+  }
+
+  _onChangeItemName(String name) {
+    setState(() {
+      this.name = name;
+    });
+  }
+
+  _onChangeItemQuantity(String quantity) {
+    setState(() {
+      this.quantity = double.parse(quantity);
+    });
+  }
+
+  _onChangeItemUnit(String? unit) {
+    if (unit == null) return;
+    setState(() {
+      this.unit = unit;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        decoration: const BoxDecoration(
+            border: Border(top: BorderSide(color: Colors.blue, width: 5))),
+        child: Padding(
+            padding:
+                const EdgeInsets.only(left: 15, top: 10, right: 15, bottom: 10),
+            child: Row(children: [
+              Expanded(
+                  child: Column(children: [
+                TextField(
+                  onChanged: _onChangeItemName,
+                  decoration: const InputDecoration(labelText: "Name"),
+                ),
+                Container(
+                  height: 10,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                        child: TextField(
+                      keyboardType: TextInputType.number,
+                      onChanged: _onChangeItemQuantity,
+                      decoration: const InputDecoration(labelText: "Quantity"),
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    )),
+                    Container(width: 10),
+                    DropdownMenu(
+                        label: const Text("Unit"),
+                        onSelected: _onChangeItemUnit,
+                        dropdownMenuEntries: BASE_UNITS
+                            .map((unit) =>
+                                DropdownMenuEntry(value: unit, label: unit))
+                            .toList()),
+                  ],
+                )
+              ])),
+              Container(width: 10),
+              Center(
+                  child: IconButton(
+                      onPressed: _addNewItem, icon: const Icon(Icons.add)))
+            ])));
   }
 }
