@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shopping_list/models/shopping_item.dart';
 import 'package:shopping_list/utils/constants.dart';
 
 class AddNewItemContainer extends StatefulWidget {
-  const AddNewItemContainer({super.key, required this.addNewItem});
+  const AddNewItemContainer(
+      {super.key,
+      required this.addNewItem,
+      required this.units,
+      required this.itemNames});
 
   final Function(ShoppingItem item) addNewItem;
+  final List<String> units;
+  final List<String> itemNames;
 
   @override
   State<AddNewItemContainer> createState() => _AddNewItemContainerState();
@@ -30,12 +35,19 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
     });
   }
 
-  _onChangeItemName(String? name) {
-    if (name == null) return;
+  _onChangeItemName(String name) {
+    if (name == this.name) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         this.name = name;
       });
+    });
+  }
+
+  _onSelectItemName(String? name) {
+    if (name == null) return;
+    setState(() {
+      this.name = name;
     });
   }
 
@@ -45,12 +57,19 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
     });
   }
 
-  _onChangeItemUnit(String? unit) {
-    if (unit == null) return;
+  _onChangeItemUnit(String unit) {
+    if (unit == this.unit) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       setState(() {
         this.unit = unit;
       });
+    });
+  }
+
+  _onSelectItemUnit(String? unit) {
+    if (unit == null) return;
+    setState(() {
+      this.unit = unit;
     });
   }
 
@@ -63,7 +82,7 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
             child: Column(children: [
               DropdownMenu(
                 label: const Text("Name"),
-                onSelected: _onChangeItemName,
+                onSelected: _onSelectItemName,
                 requestFocusOnTap: true,
                 width: MediaQuery.sizeOf(context).width,
                 errorText: showErrors && name == null ? "Required" : null,
@@ -71,9 +90,9 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
                   _onChangeItemName(query);
                   return null;
                 },
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: "example", label: "example")
-                ],
+                dropdownMenuEntries: widget.itemNames
+                    .map((name) => DropdownMenuEntry(value: name, label: name))
+                    .toList(),
               ),
               Container(height: 10),
               Row(
@@ -88,14 +107,14 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
                   Container(width: 10),
                   DropdownMenu(
                       label: const Text("Unit"),
-                      onSelected: _onChangeItemUnit,
+                      onSelected: _onSelectItemUnit,
                       requestFocusOnTap: true,
                       errorText: showErrors && unit == null ? "Required" : null,
                       searchCallback: (entries, query) {
                         _onChangeItemUnit(query);
                         return null;
                       },
-                      dropdownMenuEntries: BASE_UNITS
+                      dropdownMenuEntries: widget.units
                           .map((unit) =>
                               DropdownMenuEntry(value: unit, label: unit))
                           .toList()),
