@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list/models/shopping_item.dart';
-import 'package:shopping_list/utils/constants.dart';
 
 class AddNewItemContainer extends StatefulWidget {
   const AddNewItemContainer(
@@ -18,15 +17,15 @@ class AddNewItemContainer extends StatefulWidget {
 }
 
 class _AddNewItemContainerState extends State<AddNewItemContainer> {
-  String? name = null;
+  String name = "";
   String quantity = "1";
-  String? unit = null;
+  String unit = "";
   bool showErrors = false;
 
   _addNewItem() {
     setState(() {
       var quantityNumber = double.tryParse(quantity);
-      if (name != null && quantityNumber != null && unit != null) {
+      if (name != "" && quantityNumber != null && unit != "") {
         widget.addNewItem(
             ShoppingItem(name: name!, quantity: quantityNumber, unit: unit!));
       } else {
@@ -85,12 +84,13 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
                 onSelected: _onSelectItemName,
                 requestFocusOnTap: true,
                 width: MediaQuery.sizeOf(context).width,
-                errorText: showErrors && name == null ? "Required" : null,
+                errorText: showErrors && name == "" ? "Required" : null,
                 searchCallback: (entries, query) {
                   _onChangeItemName(query);
                   return null;
                 },
                 dropdownMenuEntries: widget.itemNames
+                    .where((name) => name.contains(this.name))
                     .map((name) => DropdownMenuEntry(value: name, label: name))
                     .toList(),
               ),
@@ -109,12 +109,13 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
                       label: const Text("Unit"),
                       onSelected: _onSelectItemUnit,
                       requestFocusOnTap: true,
-                      errorText: showErrors && unit == null ? "Required" : null,
+                      errorText: showErrors && unit == "" ? "Required" : null,
                       searchCallback: (entries, query) {
                         _onChangeItemUnit(query);
                         return null;
                       },
                       dropdownMenuEntries: widget.units
+                          .where((unit) => unit.contains(this.unit))
                           .map((unit) =>
                               DropdownMenuEntry(value: unit, label: unit))
                           .toList()),
