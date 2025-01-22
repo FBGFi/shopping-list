@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Shopping List',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         useMaterial3: true,
@@ -63,7 +63,7 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
 
   _onCheckout() {
     setState(() {
-      _items.removeWhere((item) => !item.complete);
+      _items.removeWhere((item) => item.complete);
       _shoppingListBox?.put("items", _items);
     });
   }
