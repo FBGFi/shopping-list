@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shopping_list/components/zero_height_icon_button.dart';
 import 'package:shopping_list/models/shopping_item.dart';
 
 class ShoppingListItem extends StatelessWidget {
@@ -25,33 +24,25 @@ class ShoppingListItem extends StatelessWidget {
                         : Theme.of(context).colorScheme.primary,
                     width: 3),
                 color: Theme.of(context).colorScheme.primary.withAlpha(200)),
-            child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: Wrap(
-                    direction: Axis.horizontal,
-                    alignment: WrapAlignment.spaceBetween,
-                    children: [
-                      FractionallySizedBox(
-                        widthFactor: 0.85,
-                        child: Text(
-                            "${item.name}, ${item.quantity} ${item.unit}",
+            child: InkWell(
+                onTap: _toggleComplete,
+                child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Flex(direction: Axis.horizontal, children: [
+                      Expanded(
+                        child: Text(item.name,
                             style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color:
                                     Theme.of(context).colorScheme.onPrimary)),
                       ),
-                      const FractionallySizedBox(
-                        widthFactor: 0.05,
-                      ),
-                      FractionallySizedBox(
-                          widthFactor: 0.1,
-                          child: ZeroHeightIconButton(
-                              icon: Icon(item.complete
-                                  ? Icons.cancel_outlined
-                                  : Icons.check),
-                              color: Theme.of(context).colorScheme.onPrimary,
-                              onPressed: _toggleComplete)),
-                    ]))));
+                      Container(width: 10),
+                      Text("${item.quantity} ${item.unit}",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onPrimary)),
+                    ])))));
   }
 }
