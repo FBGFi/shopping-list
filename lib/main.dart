@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shopping_list/components/add_new_item_container.dart';
+import 'package:shopping_list/components/add_new_item_modal.dart';
+import 'package:shopping_list/components/footer.dart';
 import 'package:shopping_list/components/shopping_list.dart';
 import 'package:shopping_list/models/shopping_item.dart';
 import 'package:shopping_list/utils/constants.dart';
@@ -95,7 +97,10 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.blue, title: const Text("Shopping list")),
+          backgroundColor: Colors.blue,
+          title: Text("Shopping List",
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onPrimary))),
       body: Column(children: [
         _items.isEmpty
             ? const Expanded(
@@ -108,49 +113,12 @@ class _ShoppingListPageState extends State<ShoppingListPage> {
                 toggleComplete: _toggleComplete,
                 onCheckout: _onCheckout,
               )),
+        Footer(
+            items: _items,
+            addNewItem: _addNewItem,
+            units: _units,
+            itemNames: _itemNames)
       ]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              builder: (context) => GestureDetector(
-                  onTap: () {
-                    WidgetsBinding.instance.focusManager.primaryFocus
-                        ?.unfocus();
-                  },
-                  child: Scaffold(
-                      extendBody: true,
-                      appBar: AppBar(
-                          backgroundColor: Colors.blue,
-                          toolbarHeight: 80.0,
-                          leading: Align(
-                              alignment: Alignment.bottomLeft,
-                              child: IconButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  icon: const Icon(Icons.arrow_back))),
-                          title: SizedBox(
-                              height: 60.0,
-                              child: Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: Text(
-                                    "Add new item",
-                                    style: TextStyle(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onPrimary),
-                                  )))),
-                      body: AddNewItemContainer(
-                        addNewItem: _addNewItem,
-                        units: _units.toList(),
-                        itemNames: _itemNames.toList(),
-                      ))));
-        },
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }
