@@ -27,7 +27,7 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
       var quantityNumber = double.tryParse(quantity);
       if (name != "" && quantityNumber != null && unit != "") {
         widget.addNewItem(
-            ShoppingItem(name: name!, quantity: quantityNumber, unit: unit!));
+            ShoppingItem(name: name, quantity: quantityNumber, unit: unit));
       } else {
         showErrors = true;
       }
@@ -74,6 +74,11 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
 
   @override
   Widget build(BuildContext context) {
+    Iterable<String> displayedItemNames =
+        widget.itemNames.where((name) => name.contains(this.name));
+    Iterable<String> displayedUnits =
+        widget.units.where((unit) => unit.contains(this.unit));
+
     return Scaffold(
         body: Padding(
             padding:
@@ -83,14 +88,18 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
                 label: const Text("Name"),
                 onSelected: _onSelectItemName,
                 requestFocusOnTap: true,
-                width: MediaQuery.sizeOf(context).width,
+                width: MediaQuery.sizeOf(context).width - 30,
                 errorText: showErrors && name == "" ? "Required" : null,
+                menuStyle: MenuStyle(
+                    maximumSize: WidgetStateProperty.all(
+                        Size.fromHeight(displayedItemNames.isEmpty ? 0 : 200)),
+                    minimumSize:
+                        WidgetStateProperty.all(const Size.fromHeight(0))),
                 searchCallback: (entries, query) {
                   _onChangeItemName(query);
                   return null;
                 },
-                dropdownMenuEntries: widget.itemNames
-                    .where((name) => name.contains(this.name))
+                dropdownMenuEntries: displayedItemNames
                     .map((name) => DropdownMenuEntry(value: name, label: name))
                     .toList(),
               ),
@@ -110,12 +119,16 @@ class _AddNewItemContainerState extends State<AddNewItemContainer> {
                       onSelected: _onSelectItemUnit,
                       requestFocusOnTap: true,
                       errorText: showErrors && unit == "" ? "Required" : null,
+                      menuStyle: MenuStyle(
+                          maximumSize: WidgetStateProperty.all(Size.fromHeight(
+                              displayedUnits.isEmpty ? 0 : 200)),
+                          minimumSize: WidgetStateProperty.all(
+                              const Size.fromHeight(0))),
                       searchCallback: (entries, query) {
                         _onChangeItemUnit(query);
                         return null;
                       },
-                      dropdownMenuEntries: widget.units
-                          .where((unit) => unit.contains(this.unit))
+                      dropdownMenuEntries: displayedUnits
                           .map((unit) =>
                               DropdownMenuEntry(value: unit, label: unit))
                           .toList()),
