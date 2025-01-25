@@ -11,6 +11,10 @@ class ShoppingListItem extends StatelessWidget {
     toggleComplete(item);
   }
 
+  String _removeDecimalZeroFormat(double n) {
+    return n.toStringAsFixed(n.truncateToDouble() == n ? 0 : 1);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -38,7 +42,8 @@ class ShoppingListItem extends StatelessWidget {
                                     Theme.of(context).colorScheme.onPrimary)),
                       ),
                       Container(width: 10),
-                      Text("${item.quantity} ${item.unit}",
+                      Text(
+                          "${_removeDecimalZeroFormat(item.quantity)} ${item.unit}",
                           style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
